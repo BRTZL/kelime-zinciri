@@ -95,7 +95,7 @@ const WordChainGameComponent: React.FC = () => {
                               )}
                             >
                               <span>{word.slice(0, word.length - 1)}</span>
-                              <span className="text-primary">
+                              <span className={!isError ? "text-primary" : ""}>
                                 {word.charAt(word.length - 1)}
                               </span>
                             </span>

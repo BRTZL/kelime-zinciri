@@ -20,9 +20,13 @@ type PlayerType = "user" | "pc"
 
 interface GameOptions {
   turnDuration?: number
+  timeoutFailureRate?: number
+  repeatedWordFailureRate?: number
 }
 
-const DEFAULT_TURN_DURATION = 3000
+const DEFAULT_TURN_DURATION = 8000
+const DEFAULT_TIMEOUT_FAILURE_RATE = 0.1
+const DEFAULT_REPEATED_WORD_FAILURE_RATE = 0.3
 
 class WordChainGame {
   private words: Words
@@ -30,6 +34,8 @@ class WordChainGame {
   private speech: Speech
   private state: GameState
   private turnDuration: number
+  private timeoutFailureRate: number
+  private repeatedWordFailureRate: number
   private timer: NodeJS.Timeout | null
   private onUpdateCallback: (state: GameState) => void
   private onGameOverCallback: (winner: PlayerType) => void
@@ -37,6 +43,10 @@ class WordChainGame {
 
   constructor(options?: GameOptions) {
     const turnDuration = options?.turnDuration || DEFAULT_TURN_DURATION
+    const timeoutFailureRate =
+      options?.timeoutFailureRate || DEFAULT_TIMEOUT_FAILURE_RATE
+    const repeatedWordFailureRate =
+      options?.repeatedWordFailureRate || DEFAULT_REPEATED_WORD_FAILURE_RATE
 
     this.words = new Words()
     this.recognition = new Recognition()
@@ -49,6 +59,8 @@ class WordChainGame {
       remainingTime: turnDuration,
     }
     this.turnDuration = turnDuration
+    this.timeoutFailureRate = timeoutFailureRate
+    this.repeatedWordFailureRate = repeatedWordFailureRate
     this.timer = null
     this.onUpdateCallback = () => {}
     this.onGameOverCallback = () => {}
@@ -58,7 +70,6 @@ class WordChainGame {
   private startListening() {
     if (this.state.userTurn && !this.state.gameOver) {
       this.recognition.start()
-      this.startTimer()
     }
   }
 
@@ -105,9 +116,7 @@ class WordChainGame {
   }
 
   private async computerTurn() {
-    await new Promise((resolve) =>
-      setTimeout(resolve, Math.random() * 3000 + 1000)
-    )
+    this.startTimer()
 
     const lastLetter = this.state.currentWord.slice(-1)
     const availableWords = this.words
@@ -120,8 +129,48 @@ class WordChainGame {
     if (availableWords.length === 0) {
       this.clearTimer()
       this.state.gameOver = true
+      this.onErrorCallback("Bulunacak kelime kalmadı.")
       this.onGameOverCallback("user")
       return
+    }
+
+    if (Math.random() < this.timeoutFailureRate) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, this.turnDuration + 1000)
+      )
+      return
+    }
+
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.random() * 3000 + 1000)
+    )
+
+    if (Math.random() < this.repeatedWordFailureRate) {
+      const usedWordsWithLastLetter = this.state.usedWords.filter(
+        (usedWord) => usedWord.word.slice(0) === lastLetter
+      )
+      if (usedWordsWithLastLetter.length > 0) {
+        const computerWord =
+          usedWordsWithLastLetter[
+            Math.floor(Math.random() * usedWordsWithLastLetter.length)
+          ].word
+        this.state.currentWord = computerWord
+        this.state.usedWords.push({
+          word: computerWord,
+          from: "pc",
+          isError: true,
+        })
+        this.state.userTurn = true
+        this.onUpdateCallback(this.state)
+        await this.speech.speak(computerWord)
+        this.clearTimer()
+        this.state.gameOver = true
+        this.onErrorCallback(
+          "Bilgisayar daha önce kullanılmış bir kelime seçti."
+        )
+        this.onGameOverCallback("user")
+        return
+      }
     }
 
     const computerWord =
@@ -135,6 +184,7 @@ class WordChainGame {
     this.state.userTurn = true
     this.onUpdateCallback(this.state)
 
+    this.startTimer()
     await this.speech.speak(computerWord)
 
     if (this.isGameOver()) {
@@ -184,7 +234,15 @@ class WordChainGame {
         if (!this.state.gameOver) {
           this.clearTimer()
           this.state.gameOver = true
-          this.onErrorCallback("Süre doldu.")
+          if (this.state.userTurn) {
+            this.onErrorCallback(
+              "Oppps! Kelime söyleyemedin ve oyunu kaybettin."
+            )
+          } else {
+            this.onErrorCallback(
+              "Oppps! Bilgisayar kelime söyleyemedi ve oyunu kazandın."
+            )
+          }
           this.onGameOverCallback(this.state.userTurn ? "pc" : "user")
           this.stopListening()
         }
@@ -214,6 +272,7 @@ class WordChainGame {
     if (this.recognition.isSupported()) {
       this.recognition.onResult(this.handleUserInput.bind(this))
       this.recognition.onError(this.handleRecognitionError.bind(this))
+      this.startTimer()
       this.startListening()
     } else {
       this.onErrorCallback(
