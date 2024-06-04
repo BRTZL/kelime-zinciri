@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Confetti } from "@/components/confetti"
 
 const WordChainGameComponent: React.FC = () => {
   const messagesContainerRef = React.useRef<HTMLDivElement>(null)
@@ -185,6 +186,8 @@ const WordChainGameComponent: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Confetti isVisible={winner === "user"} />
     </div>
   )
 }
