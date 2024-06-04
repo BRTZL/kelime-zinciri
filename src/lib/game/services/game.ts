@@ -240,7 +240,7 @@ class WordChainGame {
             )
           } else {
             this.onErrorCallback(
-              "Oppps! Bilgisayar kelime söyleyemedi ve oyunu kazandın."
+              "Bilgisayar kelime söyleyemedi ve oyunu kazandın."
             )
           }
           this.onGameOverCallback(this.state.userTurn ? "pc" : "user")

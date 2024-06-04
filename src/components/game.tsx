@@ -173,7 +173,7 @@ const WordChainGameComponent: React.FC = () => {
                 </div>
 
                 {errorMessage && (
-                  <Alert variant={winner === "pc" ? "destructive" : "default"}>
+                  <Alert variant={winner === "pc" ? "destructive" : "success"}>
                     <AlertTitle>
                       {winner === "pc" ? "Kaybettin 😔" : "Kazandın 😉"}
                     </AlertTitle>
