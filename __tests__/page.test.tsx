@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom"
 
-import { screen } from "@testing-library/dom"
-import { render } from "@testing-library/react"
+import { fireEvent, screen } from "@testing-library/dom"
+import { act, render } from "@testing-library/react"
 
 import Page from "@/app/page"
 
@@ -28,40 +28,13 @@ describe("Page", () => {
 
     const button = screen.getByRole("button")
 
-    button.click()
-
-    await new Promise((resolve) => setTimeout(resolve, 200))
+    await act(async () => {
+      fireEvent.click(button)
+      await new Promise((resolve) => setTimeout(resolve, 200))
+    })
 
     const time = screen.getByText(/saniye/i)
 
     expect(time).toBeInTheDocument()
   })
-
-  // it("shows the first word from pc when the game is started", async () => {
-  //   const mockRecognition = new (window as any).webkitSpeechRecognition()
-  //   mockRecognition.onresult = jest.fn()
-
-  //   render(<Page />)
-
-  //   const button = screen.getByRole("button")
-
-  //   button.click()
-
-  //   await new Promise((resolve) => setTimeout(resolve, 200))
-
-  //   mockRecognition.submitResult([
-  //     [
-  //       {
-  //         transcript: "random word",
-  //         confidence: 0.95,
-  //       },
-  //     ],
-  //   ])
-
-  //   await new Promise((resolve) => setTimeout(resolve, 300))
-
-  //   const alertDiv = screen.getByRole("alert")
-
-  //   expect(alertDiv).toBeInTheDocument()
-  // })
 })
