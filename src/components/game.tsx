@@ -18,8 +18,19 @@ import {
 } from "./ui/card"
 
 const WordChainGameComponent: React.FC = () => {
+  const messagesContainerRef = React.useRef<HTMLDivElement>(null)
+
   const { gameState, errorMessage, winner, startGame, restartGame } =
     useGameContext()
+
+  React.useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      })
+    }
+  }, [gameState])
 
   return (
     <div className="bg-background h-screen w-screen">
@@ -33,7 +44,10 @@ const WordChainGameComponent: React.FC = () => {
               ettirmesi gereken bir kelime oyunudur.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-1 flex-col overflow-y-scroll">
+          <CardContent
+            ref={messagesContainerRef}
+            className="flex flex-1 flex-col overflow-y-scroll"
+          >
             {gameState.usedWords.length === 0 ? (
               <div className="flex flex-1 items-center justify-center">
                 <Button onClick={startGame} className="px-12 py-5 text-xl">
