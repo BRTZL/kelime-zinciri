@@ -215,9 +215,9 @@ class WordChainGame {
       this.recognition.onError(this.handleRecognitionError.bind(this))
       this.startListening()
     } else {
-      console.warn("Speech recognition is not supported in this browser.")
-      // Handle the case when speech recognition is not supported
-      // You can display a message to the user or provide an alternative input method
+      this.onErrorCallback(
+        "Tarayıcınızda konuşma tanıma özelliği desteklenmiyor."
+      )
     }
   }
 

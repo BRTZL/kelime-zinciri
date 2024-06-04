@@ -35,7 +35,7 @@ const WordChainGameComponent: React.FC = () => {
           <CardContent className="flex flex-1 flex-col">
             {gameState.usedWords.length === 0 ? (
               <div className="flex flex-1 items-center justify-center">
-                <Button onClick={startGame} className="px-12">
+                <Button onClick={startGame} className="px-12 py-5 text-xl">
                   Oyuna Başla
                 </Button>
               </div>
@@ -79,11 +79,14 @@ const WordChainGameComponent: React.FC = () => {
                             )}
                             <span
                               className={cn(
-                                "max-w-xs rounded-md p-3",
+                                "max-w-xs rounded-md p-3 text-xl font-medium",
                                 isError ? "bg-destructive" : "bg-accent"
                               )}
                             >
-                              {word}
+                              <span>{word.slice(0, word.length - 1)}</span>
+                              <span className="text-primary">
+                                {word.charAt(word.length - 1)}
+                              </span>
                             </span>
                             {from === "user" && (
                               <Avatar className="flex items-center justify-center">
@@ -144,13 +147,6 @@ const WordChainGameComponent: React.FC = () => {
                     )}
                   </AnimatePresence>
                 </div>
-
-                {/* {!gameState.gameOver && (
-                  <p>
-                    It&apos;s {gameState.userTurn ? "your" : "computer"}&apos;s
-                    turn.
-                  </p>
-                )} */}
 
                 {errorMessage && (
                   <Alert variant={winner === "pc" ? "destructive" : "default"}>
