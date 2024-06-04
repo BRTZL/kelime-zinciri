@@ -20,7 +20,9 @@ export function Confetti({ isVisible }: ConfettiProps) {
 
       timer = setTimeout(() => {
         setIsConfettiRunning(false)
-      }, 5000)
+      }, 3000)
+    } else {
+      setIsConfettiRunning(false)
     }
 
     return () => {

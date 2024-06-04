@@ -19,14 +19,10 @@ interface GameState {
 type PlayerType = "user" | "pc"
 
 interface GameOptions {
-  turnDuration?: number
-  timeoutFailureRate?: number
-  repeatedWordFailureRate?: number
+  turnDuration: number
+  timeoutFailureRate: number
+  repeatedWordFailureRate: number
 }
-
-const DEFAULT_TURN_DURATION = 8000
-const DEFAULT_TIMEOUT_FAILURE_RATE = 0.1
-const DEFAULT_REPEATED_WORD_FAILURE_RATE = 0.3
 
 class WordChainGame {
   private words: Words
@@ -41,13 +37,7 @@ class WordChainGame {
   private onGameOverCallback: (winner: PlayerType) => void
   private onErrorCallback: (error: string) => void
 
-  constructor(options?: GameOptions) {
-    const turnDuration = options?.turnDuration || DEFAULT_TURN_DURATION
-    const timeoutFailureRate =
-      options?.timeoutFailureRate || DEFAULT_TIMEOUT_FAILURE_RATE
-    const repeatedWordFailureRate =
-      options?.repeatedWordFailureRate || DEFAULT_REPEATED_WORD_FAILURE_RATE
-
+  constructor(options: GameOptions) {
     this.words = new Words()
     this.recognition = new Recognition()
     this.speech = new Speech()
@@ -56,11 +46,11 @@ class WordChainGame {
       usedWords: [],
       userTurn: true,
       gameOver: false,
-      remainingTime: turnDuration,
+      remainingTime: options.turnDuration,
     }
-    this.turnDuration = turnDuration
-    this.timeoutFailureRate = timeoutFailureRate
-    this.repeatedWordFailureRate = repeatedWordFailureRate
+    this.turnDuration = options.turnDuration
+    this.timeoutFailureRate = options.timeoutFailureRate
+    this.repeatedWordFailureRate = options.repeatedWordFailureRate
     this.timer = null
     this.onUpdateCallback = () => {}
     this.onGameOverCallback = () => {}
@@ -226,7 +216,7 @@ class WordChainGame {
     this.clearTimer()
     this.state.remainingTime = this.turnDuration
     this.timer = setInterval(() => {
-      this.state.remainingTime -= 1000
+      this.state.remainingTime -= 100
       this.onUpdateCallback(this.state)
 
       if (this.state.remainingTime <= 0) {
@@ -247,7 +237,7 @@ class WordChainGame {
           this.stopListening()
         }
       }
-    }, 1000)
+    }, 100)
   }
 
   private clearTimer() {

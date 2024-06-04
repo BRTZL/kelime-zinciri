@@ -17,11 +17,19 @@ import {
 } from "@/components/ui/card"
 import { Confetti } from "@/components/confetti"
 
+import { Progress } from "./ui/progress"
+
 const WordChainGameComponent: React.FC = () => {
   const messagesContainerRef = React.useRef<HTMLDivElement>(null)
 
-  const { gameState, errorMessage, winner, startGame, restartGame } =
-    useGameContext()
+  const {
+    gameState,
+    timeoutDuration,
+    errorMessage,
+    winner,
+    startGame,
+    restartGame,
+  } = useGameContext()
 
   React.useEffect(() => {
     if (messagesContainerRef.current) {
@@ -32,9 +40,11 @@ const WordChainGameComponent: React.FC = () => {
     }
   }, [gameState])
 
+  const timePercentage = (gameState.remainingTime / timeoutDuration) * 100
+
   return (
-    <div className="bg-background h-screen w-screen">
-      <div className="container flex size-full items-center justify-center overflow-y-auto overflow-x-hidden py-20">
+    <div className="bg-background flex h-full w-screen flex-1 overflow-y-scroll">
+      <div className="container flex size-full flex-1 items-center justify-center py-10">
         <Card className="flex size-full flex-1 flex-col">
           <CardHeader>
             <CardTitle>Kelime Zinciri</CardTitle>
@@ -57,13 +67,16 @@ const WordChainGameComponent: React.FC = () => {
             ) : (
               <div className="relative flex flex-1 flex-col items-center">
                 {!errorMessage ? (
-                  <span className="sticky top-0 text-center text-3xl font-semibold">
-                    {Math.ceil(gameState.remainingTime / 1000)} saniye
-                  </span>
+                  <div className="sticky top-0 grid items-center gap-2">
+                    <Progress value={timePercentage} className="w-48" />
+                    <span className="text-center text-xl font-semibold">
+                      {Math.ceil(gameState.remainingTime / 1000)} saniye
+                    </span>
+                  </div>
                 ) : (
                   <Button
                     onClick={restartGame}
-                    className="sticky top-10 px-12 py-5 text-xl"
+                    className="sticky top-0 px-12 py-5 text-xl"
                     variant="outline"
                   >
                     Yeniden Başla
@@ -157,9 +170,9 @@ const WordChainGameComponent: React.FC = () => {
                           >
                             <div className="flex flex-row items-center justify-center gap-2 pt-1">
                               <span className="sr-only">Loading...</span>
-                              <div className="size-3 animate-bounce rounded-full bg-black [animation-delay:-0.3s]" />
-                              <div className="size-3 animate-bounce rounded-full bg-black [animation-delay:-0.15s]" />
-                              <div className="size-3 animate-bounce rounded-full bg-black" />
+                              <div className="size-3 animate-bounce rounded-full bg-black [animation-delay:-0.3s] dark:bg-white" />
+                              <div className="size-3 animate-bounce rounded-full bg-black [animation-delay:-0.15s] dark:bg-white" />
+                              <div className="size-3 animate-bounce rounded-full bg-black dark:bg-white" />
                             </div>
                           </span>
                           {gameState.userTurn && (

@@ -4,12 +4,17 @@ import React, { createContext, useContext, useReducer } from "react"
 
 import { GameState, PlayerType, WordChainGame } from "../services/game"
 
+const TURN_DURATION = 8000
+const TIMEOUT_FAILURE_RATE = 0.1
+const REPEATED_WORD_FAILURE_RATE = 0.3
+
 interface GameContextType {
   gameState: GameState
   startGame: () => void
   restartGame: () => void
   errorMessage?: string
   winner?: PlayerType
+  timeoutDuration: number
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
@@ -31,7 +36,14 @@ type GameProviderProps = {
 }
 
 export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
-  const [game] = React.useState(() => new WordChainGame())
+  const [game] = React.useState(
+    () =>
+      new WordChainGame({
+        turnDuration: TURN_DURATION,
+        timeoutFailureRate: TIMEOUT_FAILURE_RATE,
+        repeatedWordFailureRate: REPEATED_WORD_FAILURE_RATE,
+      })
+  )
   const [errorMessage, setErrorMessage] = React.useState<string>()
   const [winner, setWinner] = React.useState<PlayerType>()
   const [gameState, dispatch] = useReducer(gameReducer, initialGameState)
@@ -72,6 +84,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     gameState,
     startGame,
     restartGame,
+    timeoutDuration: TURN_DURATION,
   }
 
   return (
