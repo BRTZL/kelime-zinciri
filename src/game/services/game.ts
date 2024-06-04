@@ -22,7 +22,7 @@ interface GameOptions {
   turnDuration?: number
 }
 
-const DEFAULT_TURN_DURATION = 10000
+const DEFAULT_TURN_DURATION = 3000
 
 class WordChainGame {
   private words: Words
@@ -184,6 +184,7 @@ class WordChainGame {
         if (!this.state.gameOver) {
           this.clearTimer()
           this.state.gameOver = true
+          this.onErrorCallback("Süre doldu.")
           this.onGameOverCallback(this.state.userTurn ? "pc" : "user")
           this.stopListening()
         }
@@ -219,6 +220,19 @@ class WordChainGame {
         "Tarayıcınızda konuşma tanıma özelliği desteklenmiyor."
       )
     }
+  }
+
+  public restart() {
+    this.state = {
+      currentWord: "",
+      usedWords: [],
+      userTurn: true,
+      gameOver: false,
+      remainingTime: this.turnDuration,
+    }
+    this.onUpdateCallback(this.state)
+    this.clearTimer()
+    this.start()
   }
 
   public onUpdate(callback: (state: GameState) => void) {

@@ -18,7 +18,8 @@ import {
 } from "./ui/card"
 
 const WordChainGameComponent: React.FC = () => {
-  const { gameState, errorMessage, winner, startGame } = useGameContext()
+  const { gameState, errorMessage, winner, startGame, restartGame } =
+    useGameContext()
 
   return (
     <div className="bg-background h-screen w-screen">
@@ -32,7 +33,7 @@ const WordChainGameComponent: React.FC = () => {
               ettirmesi gereken bir kelime oyunudur.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-1 flex-col">
+          <CardContent className="flex flex-1 flex-col overflow-y-scroll">
             {gameState.usedWords.length === 0 ? (
               <div className="flex flex-1 items-center justify-center">
                 <Button onClick={startGame} className="px-12 py-5 text-xl">
@@ -40,11 +41,21 @@ const WordChainGameComponent: React.FC = () => {
                 </Button>
               </div>
             ) : (
-              <>
-                <span className="text-center text-3xl font-semibold">
-                  {Math.ceil(gameState.remainingTime / 1000)} seconds
-                </span>
-                <div className="size-full overflow-x-hidden overflow-y-scroll">
+              <div className="relative flex flex-1 flex-col items-center">
+                {!errorMessage ? (
+                  <span className="sticky top-0 text-center text-3xl font-semibold">
+                    {Math.ceil(gameState.remainingTime / 1000)} saniye
+                  </span>
+                ) : (
+                  <Button
+                    onClick={restartGame}
+                    className="sticky top-10 px-12 py-5 text-xl"
+                    variant="outline"
+                  >
+                    Yeniden Başla
+                  </Button>
+                )}
+                <div className="size-full flex-1">
                   <AnimatePresence>
                     {gameState.usedWords.map(
                       ({ word, from, isError }, index) => (
@@ -156,7 +167,7 @@ const WordChainGameComponent: React.FC = () => {
                     <AlertDescription>{errorMessage}</AlertDescription>
                   </Alert>
                 )}
-              </>
+              </div>
             )}
           </CardContent>
         </Card>

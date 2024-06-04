@@ -7,6 +7,7 @@ import { GameState, PlayerType, WordChainGame } from "../services/game"
 interface GameContextType {
   gameState: GameState
   startGame: () => void
+  restartGame: () => void
   errorMessage?: string
   winner?: PlayerType
 }
@@ -53,6 +54,12 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     game.start()
   }
 
+  const restartGame = () => {
+    setErrorMessage(undefined)
+    setWinner(undefined)
+    game.restart()
+  }
+
   React.useEffect(() => {
     game.onUpdate(handleGameUpdate)
     game.onGameOver(handleGameOver)
@@ -64,6 +71,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     winner,
     gameState,
     startGame,
+    restartGame,
   }
 
   return (
