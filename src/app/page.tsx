@@ -1,5 +1,4 @@
-import { GameProvider } from "@/game"
-
+import { GameProvider } from "@/lib/game"
 import WordChainGameComponent from "@/components/game"
 
 export default function Home() {

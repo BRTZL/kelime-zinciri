@@ -1,21 +1,20 @@
 "use client"
 
 import React from "react"
-import { useGameContext } from "@/game"
 import { AnimatePresence, motion } from "framer-motion"
 
+import { useGameContext } from "@/lib/game"
 import { cn } from "@/lib/utils"
-import { Avatar, AvatarFallback } from "@/ui/avatar"
-import { Button } from "@/ui/button"
-
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card"
+} from "@/components/ui/card"
 
 const WordChainGameComponent: React.FC = () => {
   const messagesContainerRef = React.useRef<HTMLDivElement>(null)

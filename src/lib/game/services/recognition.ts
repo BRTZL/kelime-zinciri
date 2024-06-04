@@ -1,10 +1,13 @@
 export class Recognition {
-  private recognition: SpeechRecognition
+  private recognition: SpeechRecognition | null = null
   private onResultCallback: (result: string) => void
   private onErrorCallback: (error: SpeechRecognitionErrorEvent) => void
 
   constructor() {
-    if (typeof window !== "undefined") {
+    this.onResultCallback = () => {}
+    this.onErrorCallback = () => {}
+
+    if (this.isSupported()) {
       const SpeechRecognitionAPI =
         window.SpeechRecognition || window.webkitSpeechRecognition
 
@@ -14,9 +17,6 @@ export class Recognition {
       this.recognition.interimResults = false
       this.recognition.maxAlternatives = 1
 
-      this.onResultCallback = () => {}
-      this.onErrorCallback = () => {}
-
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = event.results[0][0].transcript
         this.onResultCallback(transcript)
@@ -25,17 +25,19 @@ export class Recognition {
       this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         this.onErrorCallback(event)
       }
-    } else {
-      throw new Error("Recognition is not supported in this environment.")
     }
   }
 
   start() {
-    this.recognition.start()
+    if (this.recognition) {
+      this.recognition.start()
+    }
   }
 
   stop() {
-    this.recognition.stop()
+    if (this.recognition) {
+      this.recognition.stop()
+    }
   }
 
   onResult(callback: (result: string) => void) {
@@ -47,6 +49,9 @@ export class Recognition {
   }
 
   isSupported() {
-    return "SpeechRecognition" in window || "webkitSpeechRecognition" in window
+    return (
+      typeof window !== "undefined" &&
+      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
+    )
   }
 }

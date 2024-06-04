@@ -1,4 +1,4 @@
-import wordList from "@/game/db/names.json"
+import wordList from "@/lib/game/db/names.json"
 
 export class Words {
   private wordList: string[]
